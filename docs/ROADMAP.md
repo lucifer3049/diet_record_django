@@ -1,54 +1,91 @@
-# AI Nutrition Advisor — 開發路線圖
+# AI Nutrition Advisor — 開發路線圖（Roadmap）
 
+> 回到 [README](../README.md) ｜ 相關：[architecture.md](architecture.md)、[developer-guide.md](developer-guide.md)
+>
 > 學習導向、可演進專案。每個里程碑 = 一條能跑、能 demo 的 vertical slice。
 > 原則：先做出能跑的東西 → 親身體驗每個 pattern 為何存在 → 邊界乾淨。拒絕 over-engineering。
 
 ## 進度總覽
-- [ ] M0 Walking Skeleton（進行中）
-- [ ] M1 使用者 + 健康指標
-- [ ] M2 飲食紀錄（純 CRUD）
-- [ ] M3 食物知識庫 + ETL（單一來源、無向量）
-- [ ] M4 LLM 營養分析（無 RAG）
-- [ ] M5 RAG + pgvector
-- [ ] M6 擴充 + observability + 上雲
+
+- [x] **M0** Walking Skeleton ✅
+- [~] **M1** 使用者 + 健康指標（M1.1 完成）
+- [ ] **M2** 飲食紀錄（純 CRUD）
+- [ ] **M3** 食物知識庫 + ETL（單一來源、無向量）
+- [ ] **M4** LLM 營養分析（無 RAG）→ 此時才引入 `AIProvider` port
+- [ ] **M5** RAG + pgvector
+- [ ] **M6** 擴充 + observability + 上雲
+
+**架構決策（M1–M3）**：務實 Django service layer，非完整 Hexagonal。
+**層對應**：domain = `domain.py` + model 不變式｜application = `services.py`(寫) + `selectors.py`(讀)｜infrastructure = ORM/DB/cache｜interface = DRF view + serializer。
 
 ---
 
-## M0 — Walking Skeleton
-目的：環境一致性、12-factor 設定、容器化、健康檢查、CI 綠燈。
+## M0 — Walking Skeleton ✅
+
 - [x] 專案結構（modular monolith 雛形）
 - [x] 相依管理（uv + pyproject）
 - [x] 設定分層 base/dev/prod（環境變數驅動，secret 不寫死）
-- [x] 自訂 User model 雛形（鎖定 AUTH_USER_MODEL，避免日後 migration 地獄）
-- [x] Docker 多階段 + compose（web / db / redis）
-- [x] 健康檢查 /healthz（liveness）+ /readyz（readiness：DB + Redis）
-- [ ] （你執行）compose up + migrate，確認 /readyz 回 200
-- [ ] （下一步）GitHub Actions CI：ruff + mypy + pytest 跑綠
-- [ ] （下一步）首次 commit + 第一個 smoke test
-刻意不做：DDD/Hexagonal 全套、repository/service 目錄、LLM、向量資料庫。
+- [x] 自訂 User model（鎖定 `AUTH_USER_MODEL`）
+- [x] Docker 多階段 + compose（web/db/redis，含 healthcheck 啟動順序）
+- [x] 健康檢查 `/healthz`（liveness）+ `/readyz`（readiness：DB + Redis）
+- [x] smoke test（liveness 零依賴 + readiness 整合）
+- [x] GitHub Actions CI：ruff + ruff format + mypy + `makemigrations --check` + pytest
+- [x] 首次 commit + push，CI 設定就緒
 
-## M1 — 使用者 + 健康指標
-- [ ] accounts：JWT + Refresh Token + Profile 欄位
-- [ ] health：體重 / BMI / 體脂 紀錄 + 趨勢查詢
-- [ ] 導入 service layer，畫出 fat model 的界線
-- [ ] typed Django：custom manager/queryset、明確 transaction.atomic()
-- [ ] Vue3 thin slice（登入 + 健康頁）並行起跑
+**踩過的坑**（已收斂進 `bootstrap.sh` 與 [developer-guide.md](developer-guide.md#9-常見問題與排錯指南)）：MSYS 路徑轉換、settings 沒拆套件、apps.py name、urls.py 沒覆蓋、Dockerfile 行內註解、manage.py 缺型別、mypy exclude 對命令列無效。
+
+---
+
+## M1 — 使用者 + 健康指標（進行中）
+
+### M1.1 領域模型 + 純領域邏輯 ✅
+- [x] accounts：`UserProfile`（gender/birth_date/height/activity/goal）+ `User.__str__`
+- [x] accounts：`age` 為 model property（單一實體、純計算）
+- [x] health：`HealthRecord`（weight/body_fat/waist/recorded_at，time-series，含中文 verbose_name）
+- [x] health：custom QuerySet（`for_user` / `chronological` / `most_recent_first`）
+- [x] health：複合索引 `(user, -recorded_at)`
+- [x] health/`domain.py`：`compute_bmi` + `classify_bmi`（純函式，台灣國健署切點）
+- [x] 純領域單元測試（無 DB）+ 整合測試（4 passed）
+
+**設計重點**：`age` 放 model、BMI 不放 model（跨實體）→ 公式進 domain、取數進 selector。詳見 [architecture.md](architecture.md#3-簽名級設計決策age-在-modelbmi-不在-model)。
+
+### M1.2 application 層（下一步）
+- [ ] `selectors.py`：`latest_bmi` / `weight_trend`（抓 height + 最新 weight → `compute_bmi` → `classify`）
+- [ ] `services.py`：`record_measurement`（驗證 + `transaction.atomic` + 建立）
+- [ ] 明確的窄交易邊界
+
+### M1.3 JWT 認證（accounts）
+- [ ] SimpleJWT：access/refresh、登入、刷新
+- [ ] 註冊 service：顯式建立 User + UserProfile（不用 signal）
+
+### M1.4 interface 層（DRF）
+- [ ] 薄 view（CBV/generics）+ 純 I/O serializer
+- [ ] endpoints：profile、health records（建立/列表）、bmi、trend
+- [ ] 評估導入 drf-spectacular（OpenAPI）
+
+### M1.5 測試
+- [ ] factory_boy factories（User/Profile/HealthRecord）
+- [ ] service / selector / API 測試；導入 pytest-cov（目標 ≥ 80%）
+
+### M1.6 Vue3 thin slice（並行）
+- [ ] 登入 + 健康紀錄頁（typed API client）
+
+---
 
 ## M2 — 飲食紀錄（純 CRUD）
-- [ ] diary：早午晚點心、食物搜尋、DRF API
-- [ ] N+1 / index 策略、送出 idempotency
+- [ ] `diary`：早午晚點心、食物搜尋、DRF API｜N+1 / index / 送出 idempotency
 
 ## M3 — 食物知識庫 + ETL
-- [ ] foods：資料模型 + PostgreSQL 全文檢索（先不上向量）
-- [ ] 一條 ETL pipeline（單一來源）+ 增量更新 + Celery task + 重試
+- [ ] `foods`：資料模型 + PostgreSQL 全文檢索（先不上向量）
+- [ ] 一條 ETL（單一來源）+ 增量更新 + Celery task + 重試
 
 ## M4 — LLM 營養分析（無 RAG）
-- [ ] ai：抽象 AIProvider + OpenAI/Gemini 實作、DI、prompt 管理、async + timeout/retry
-- [ ] 親眼看到幻覺與來源不可信 → 這就是 M5 的動機
+- [ ] `ai`：`AIProvider` port + OpenAI/Gemini adapter、DI、prompt 管理、async + timeout/retry
+- [ ] 親眼看到幻覺與來源不可信 → M5 的動機
 
 ## M5 — RAG + pgvector
-- [ ] knowledge_base：embedding / chunk / retrieval / context 組裝 / 引用來源
+- [ ] `knowledge_base`：embedding / chunk / retrieval / context 組裝 / 引用來源
 
 ## M6 — 擴充 + observability + 上雲
 - [ ] 運動 / 食譜推薦（重用 AI 層）、Celery Beat 排程化
-- [ ] structured logging + tracing + metrics、prod-lean image、上雲
+- [ ] structured logging + tracing + metrics、prod image 移除 dev 依賴、上雲（見 [deployment.md](deployment.md)）

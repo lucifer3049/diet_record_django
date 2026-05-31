@@ -24,7 +24,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 THIRD_PARTY_APPS = ["rest_framework"]
-LOCAL_APPS = ["apps.accounts"]
+LOCAL_APPS = ["apps.accounts", "apps.health"]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
