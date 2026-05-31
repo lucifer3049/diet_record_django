@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9          # 對齊你 pyproject 的 ruff 版本
+    hooks:
+      - id: ruff          # lint（含 import 排序）
+        args: [--fix]
+      - id: ruff-format    # 格式化
+      
