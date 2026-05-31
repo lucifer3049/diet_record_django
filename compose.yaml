@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nutrition}
+      POSTGRES_USER: ${POSTGRES_USER:-nutrition}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nutrition}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nutrition}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports: ["5432:5432"]
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports: ["6379:6379"]
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000   # dev 覆寫 gunicorn
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      SECRET_KEY: ${SECRET_KEY:-dev-insecure-change-me}
+      DATABASE_URL: postgres://${POSTGRES_USER:-nutrition}:${POSTGRES_PASSWORD:-nutrition}@db:5432/${POSTGRES_DB:-nutrition}
+      REDIS_URL: redis://redis:6379/0
+    volumes: [".:/app"]
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+volumes:
+  pgdata:

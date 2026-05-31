@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: nutrition
+          POSTGRES_USER: nutrition
+          POSTGRES_PASSWORD: nutrition
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U nutrition"
+          --health-interval 5s --health-timeout 3s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 5
+    env:
+      SECRET_KEY: ci-insecure-secret
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgres://nutrition:nutrition@localhost:5432/nutrition
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check --output-format=github .
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Type check
+        run: uv run mypy .
+      - name: Migration safety（model 改了沒產 migration 就擋下）
+        run: uv run python manage.py makemigrations --check --dry-run
+      - name: Tests
+        run: uv run pytest -q

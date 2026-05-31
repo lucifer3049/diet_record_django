@@ -1,0 +1,51 @@
+[project]
+name = "nutrition-advisor"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<5.3",            # 5.2 LTS：長期專案優先 LTS，安全更新到 ~2028
+    "djangorestframework>=3.15",
+    "django-environ>=0.11",
+    "psycopg[binary]>=3.2",        # psycopg3
+    "redis>=5.0",
+    "gunicorn>=22.0",
+]
+
+[dependency-groups]                # PEP 735；uv sync 預設會裝 dev
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+    "factory-boy>=3.3",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "django-stubs[compatible-mypy]>=5.0",
+    "djangorestframework-stubs>=3.15",
+]
+
+[tool.uv]
+package = false                    # 這是「應用」不是「函式庫」，不需 build
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["**/migrations/**"]  
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]  
+[tool.ruff.lint.per-file-ignores]
+"config/settings/*" = ["F403", "F405"]   # settings 慣用 import *
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+strict = true
+exclude = ["migrations/"]
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
+
+[[tool.mypy.overrides]]
+module = "environ.*"
+ignore_missing_imports = true
