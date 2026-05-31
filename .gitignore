@@ -1,17 +1,3 @@
-先給結論:這就是 merge conflict——pull 把你的 .gitignore 和 GitHub 自動生成的 Python .gitignore 撞在一起了。 這兩份內容其實不衝突、是互補的,正解是「兩邊都留」,順手把你那份的內容併進更完整的版本。
-先看懂這三行記號
-<<<<<<< HEAD          ← 你本機的版本（從這裡開始）
-（你的 4 行）
-=======               ← 分隔線
-（GitHub 那份超長的標準 Python gitignore）
->>>>>>> 770d201...    ← 遠端的版本（到這裡結束）
-Git 不知道該選哪邊,所以把兩邊都塞進檔案、用記號夾起來等你決定。這三行記號(<<<<<<<、=======、>>>>>>>)最後一定要全部刪掉,否則它們會變成 .gitignore 的內容(那是壞檔)。
-該保留什麼
-GitHub 那份(下半段)是 GitHub 官方維護的標準 Python ignore,幾乎涵蓋了你上半段的所有項目(__pycache__、.env、.venv、.pytest_cache、.mypy_cache、.ruff_cache 它全有),而且多了 Celery / Redis / RabbitMQ / Django 等對你這專案剛好用得到的條目。
-唯一你有、它沒有的是 staticfiles/(你 M0 的 STATIC_ROOT)。所以策略:以 GitHub 那份為主,把 staticfiles/ 補進去。
-最簡單的修法(直接覆蓋成乾淨版)
-不用在編輯器裡一行一行刪記號,直接覆蓋掉整個檔案最省事:
-bashcat > .gitignore << 'EOF'
 # Python
 __pycache__/
 *.py[codz]
