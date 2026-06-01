@@ -1,6 +1,6 @@
 # 環境建置（Setup）
 
-> 回到 [README](../README.md) ｜ 相關：[docker.md](docker.md)、[commands.md](commands.md)、[developer-guide.md](developer-guide.md)
+> 回到 [README](../README.md) ｜ 相關：[DOCKER.md](DOCKER.md)、[COMMANDS.md](COMMANDS.md)、[DEVELOPER-GUIDE.md](DEVELOPER-GUIDE.md)
 
 本專案採 **Docker-first**：所有相依裝在容器內，本機**不需安裝 Python、不會產生 venv**。
 

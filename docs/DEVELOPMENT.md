@@ -1,6 +1,6 @@
 # 開發流程（Development）
 
-> 回到 [README](../README.md) ｜ 相關：[code_quality.md](code_quality.md)、[testing.md](testing.md)、[developer-guide.md](developer-guide.md)、[commands.md](commands.md)
+> 回到 [README](../README.md) ｜ 相關：[CODE_QUALITY.md](CODE_QUALITY.md)、[TESTING.md](TESTING.md)、[DEVELOPER-GUIDE.md](DEVELOPER-GUIDE.md)、[COMMANDS.md](COMMANDS.md)
 
 ---
 

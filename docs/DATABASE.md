@@ -1,6 +1,6 @@
 # 資料模型與 Migration（Database）
 
-> 回到 [README](../README.md) ｜ 相關：[architecture.md](architecture.md)、[commands.md](commands.md)
+> 回到 [README](../README.md) ｜ 相關：[ARCHITECTURE.md](ARCHITECTURE.md)、[COMMANDS.md](COMMANDS.md)
 
 ---
 

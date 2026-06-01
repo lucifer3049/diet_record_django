@@ -51,15 +51,15 @@
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Interface（介面層）   DRF View + Serializer          │  ← HTTP I/O，薄
+│  Interface（介面層）   DRF View + Serializer         │  ← HTTP I/O，薄
 ├─────────────────────────────────────────────────────┤
 │  Application（應用層） services.py（寫）              │  ← 用例編排、交易邊界
-│                        selectors.py（讀）             │
+│                        selectors.py（讀）            │
 ├─────────────────────────────────────────────────────┤
 │  Domain（領域層）      domain.py（純函式）            │  ← 業務規則，零框架相依
-│                        model 內在不變式               │
+│                        model 內在不變式              │
 ├─────────────────────────────────────────────────────┤
-│  Infrastructure（基礎設施） Django ORM / DB / Cache   │  ← 框架與外部資源
+│  Infrastructure（基礎設施） Django ORM / DB / Cache  │  ← 框架與外部資源
 └─────────────────────────────────────────────────────┘
 ```
 

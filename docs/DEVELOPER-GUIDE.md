@@ -1,7 +1,7 @@
 # 開發者指南（Developer Guide）
 
 > 回到 [README](../README.md)
-> 新進開發者的單一上手文件。讀完這份 + [setup.md](setup.md) 即可開始貢獻。
+> 新進開發者的單一上手文件。讀完這份 + [SETUP.md](SETUP.md) 即可開始貢獻。
 
 ---
 

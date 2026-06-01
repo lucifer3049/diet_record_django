@@ -1,6 +1,6 @@
 # 常用指令整理（Commands）
 
-> 回到 [README](../README.md) ｜ 相關：[setup.md](setup.md)、[docker.md](docker.md)、[development.md](development.md)
+> 回到 [README](../README.md) ｜ 相關：[SETUP.md](SETUP.md)、[DOCKER.md](DOCKER.md)、[DEVELOPMENT.md](DEVELOPMENT.md)
 
 本文件整理開發全程會用到的終端機指令，依分類列出。每個指令含：**用途**、**使用情境**、**範例**。
 

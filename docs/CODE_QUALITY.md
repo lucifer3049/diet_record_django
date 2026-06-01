@@ -1,6 +1,6 @@
 # 程式碼品質（Ruff、MyPy、Lint）
 
-> 回到 [README](../README.md) ｜ 相關：[testing.md](testing.md)、[development.md](development.md)、[commands.md](commands.md)
+> 回到 [README](../README.md) ｜ 相關：[TESTING.md](TESTING.md)、[DEPLOYMENT.md](DEPLOYMENT.md)、[COMMANDS.md](COMMANDS.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # Docker 指令與架構
 
-> 回到 [README](../README.md) ｜ 相關：[setup.md](setup.md)、[commands.md](commands.md)、[deployment.md](deployment.md)
+> 回到 [README](../README.md) ｜ 相關：[SETUP.md](SETUP.md)、[COMMANDS.md](COMMANDS.md)、[DEPLOYMENT.md](DEPLOYMENT.md)
 
 ---
 

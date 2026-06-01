@@ -1,6 +1,6 @@
 # 部署流程（Deployment）
 
-> 回到 [README](../README.md) ｜ 相關：[docker.md](docker.md)、[code_quality.md](code_quality.md)、[ROADMAP.md](ROADMAP.md)
+> 回到 [README](../README.md) ｜ 相關：[DOCKER.md](DOCKER.md)、[CODE_QUALITY.md](CODE_QUALITY.md)、[ROADMAP.md](ROADMAP.md)
 
 > **現況**：專案目前尚未部署至雲端（上雲規劃於 **M6**）。本文件涵蓋：已就緒的 prod 設定、CI pipeline 現況、以及雲端部署的規劃方向。
 
