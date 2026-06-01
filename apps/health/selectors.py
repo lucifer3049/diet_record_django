@@ -17,6 +17,7 @@ class BMIResult:
     weight_kg: Decimal
     height_cm: Decimal
 
+
 @dataclass(frozen=True, slots=True)
 class WeightPoint:
     recorded_at: str
@@ -44,6 +45,7 @@ def latest_bmi(user: User) -> BMIResult | None:
         weight_kg=record.weight_kg,
         height_cm=height_cm,
     )
+
 
 def weight_trend(user: User, *, limit: int = 90) -> list[WeightPoint]:
     """
